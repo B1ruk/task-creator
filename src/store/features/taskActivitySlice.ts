@@ -26,30 +26,7 @@ export interface EquipmentCostPayLoad {
 }
 
 const initialState: TaskActivityState = {
-  taskActivities: [
-    {
-      isActivity: false,
-      modelId: 1,
-      name: "task #1",
-      projectId: 1,
-      parentId: 0,
-      key: 1,
-      equipmentCosts: [],
-      laborCosts: [],
-      materialCosts: [],
-    },
-    {
-      isActivity: true,
-      modelId: 2,
-      name: "Activty#1",
-      parentId: 0,
-      projectId: 2,
-      key: 2,
-      equipmentCosts: [],
-      laborCosts: [],
-      materialCosts: [],
-    },
-  ],
+  taskActivities: JSON.parse(localStorage.getItem('task-data')),
 };
 
 export const taskActivitySlice = createSlice({

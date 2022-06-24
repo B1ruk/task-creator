@@ -1,7 +1,9 @@
 import { TaskActivityModel } from "./TaskActivityModel";
 
 export const mapTaskActivityToTree = (taskActivites: TaskActivityModel[]) => {
-  const parentIds = taskActivites.map((task) => task.modelId);
+  const parentIds = taskActivites
+    .filter((task) => task.parentId === 0)
+    .map((task) => task.modelId);
 
   const parentNodes = new Set(parentIds);
 
@@ -20,8 +22,6 @@ export const mapTaskActivityToTree = (taskActivites: TaskActivityModel[]) => {
   });
 };
 
-//we need to iterate through nodes
-
 function createNode(parentId: number | undefined, datas: TaskActivityModel[]) {
   const task: TaskActivityModel | undefined = datas.find(
     (task) => task.modelId == parentId
@@ -36,9 +36,8 @@ function createNode(parentId: number | undefined, datas: TaskActivityModel[]) {
           .filter(
             (taskModel) =>
               task.modelId == taskModel.parentId &&
-              task.modelId != taskModel.modelId &&
-              !task.isActivity
-          )
+              task.modelId != taskModel.modelId
+              )
           .map((subTask) => {
             return {
               key: task.parentId + "-" + task.projectId + subTask.key,
@@ -52,4 +51,14 @@ function createNode(parentId: number | undefined, datas: TaskActivityModel[]) {
   return {
     children: [],
   };
+}
+
+
+function createChildNodes(datas:TaskActivityModel[],parentTask:TaskActivityModel){
+  const subTasks=datas.filter(task=>task.parentId==parentTask.modelId);
+
+  if(subTasks.length>0){
+
+  }
+  return[];
 }

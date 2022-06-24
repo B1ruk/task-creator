@@ -7,6 +7,7 @@ import "primereact/resources/primereact.min.css";
 import "primereact/resources/themes/lara-light-indigo/theme.css";
 import { TreeTable } from "primereact/treetable";
 import { useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import "./App.css";
 import { AddTaskDialog } from "./components/task/AddTask";
@@ -27,10 +28,10 @@ function App() {
   const [addTaskToggle, setAddTaskToggle] = useState(false);
   const [taskParentNode, setTaskParentNode] = useState(0);
   const [isActivity, setIsActivity] = useState(false);
-  const [taskTitle,setTaskTitle]=useState("");
-  
+  const [taskTitle, setTaskTitle] = useState("");
+
   const appDispatch = useAppDispatch();
-  const navigate=useNavigate();
+  const navigate = useNavigate();
 
   const toggleModal = () => {
     setAddTaskToggle(!addTaskToggle);
@@ -49,6 +50,8 @@ function App() {
   useEffect(() => {
     const treeData = mapTaskActivityToTree(taskActivities);
 
+    localStorage.setItem('task-data',JSON.stringify(taskActivities));
+
     console.log(treeData);
     setNodes({ root: treeData });
   }, [taskActivities]);
@@ -57,10 +60,10 @@ function App() {
     toggleModal();
   };
 
-  const addSubActivity=()=>{
+  const addSubActivity = () => {
     setIsActivity(true);
     toggleModal();
-  }
+  };
 
   const userActionItems = [
     {
@@ -71,12 +74,13 @@ function App() {
     {
       label: "Add Activity",
       icon: "pi pi-pencil",
-      command:()=>addSubActivity()
+      command: () => addSubActivity(),
     },
     {
       label: "View Report",
       icon: "pi pi-chart-pie",
-      command:()=>navigate(`activityReport/${taskParentNode}?name=${taskTitle}`)
+      command: () =>
+        navigate(`activityReport/${taskParentNode}?name=${taskTitle}`),
     },
   ];
 
