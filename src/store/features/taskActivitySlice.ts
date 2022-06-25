@@ -26,7 +26,7 @@ export interface EquipmentCostPayLoad {
 }
 
 const initialState: TaskActivityState = {
-  taskActivities: JSON.parse(localStorage.getItem('task-data')),
+  taskActivities: JSON.parse(localStorage.getItem('task-data'))||[],
 };
 
 export const taskActivitySlice = createSlice({
