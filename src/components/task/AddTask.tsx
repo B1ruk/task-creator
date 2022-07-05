@@ -1,8 +1,9 @@
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
+import { Dropdown } from "primereact/dropdown";
 import React, { useState } from "react";
 import { ControlledInput } from "../form/ControlledInput";
-import { useAppDispatch } from "../../store/store";
+import { useAppDispatch, useAppSelector } from "../../store/store";
 import { addTask } from "../../store/features/taskActivitySlice";
 
 export const AddTaskDialog = ({
@@ -16,6 +17,9 @@ export const AddTaskDialog = ({
   const [name, setName] = useState("");
 
   const dispatch = useAppDispatch();
+
+
+  const keys = useAppSelector((state) => state.taskActivity.keys);
 
   const addTaskOnClick = () => {
     dispatch(
@@ -50,7 +54,13 @@ export const AddTaskDialog = ({
         <div className="field ml-4">
           <label className="">Key</label>
 
-          <ControlledInput onUpdate={(val) => setKey(val)} type={"text"} defaultValue={""}/>
+          <Dropdown 
+           value={key}
+           options={keys}
+           onChange={e=>setKey(e.value)}
+          />
+
+          {/* <ControlledInput onUpdate={(val) => setKey(val)} type={"text"} defaultValue={""}/> */}
         </div>
 
         <div className="field ml-4">

@@ -10,3 +10,5 @@ export const FormInput = ({ onUpdate, defaultValue, labelName }) => {
     </div>
   );
 };
+
+

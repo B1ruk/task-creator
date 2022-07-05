@@ -11,6 +11,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import "./App.css";
 import { AddTaskDialog } from "./components/task/AddTask";
+import { KeyDialog } from "./components/task/KeyDialog";
 import { mapTaskActivityToTree } from "./model/model-tree";
 import { TaskActivityModel } from "./model/TaskActivityModel";
 import { updateTask } from "./store/features/taskActivitySlice";
@@ -29,6 +30,7 @@ function App() {
   const [taskParentNode, setTaskParentNode] = useState(0);
   const [isActivity, setIsActivity] = useState(false);
   const [taskTitle, setTaskTitle] = useState("");
+  const [toggleKeyDialog, setToggleKeyDialog] = useState(false);
 
   const appDispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -50,7 +52,7 @@ function App() {
   useEffect(() => {
     const treeData = mapTaskActivityToTree(taskActivities);
 
-    localStorage.setItem('task-data',JSON.stringify(taskActivities));
+    localStorage.setItem("task-data", JSON.stringify(taskActivities));
 
     console.log(treeData);
     setNodes({ root: treeData });
@@ -135,6 +137,7 @@ function App() {
         >
           <span className="px-2">Task</span>
         </Button>
+
         <Button
           type="button"
           icon="pi pi-plus"
@@ -165,6 +168,13 @@ function App() {
             onShow={onShow}
           />
 
+          {toggleKeyDialog && (
+            <KeyDialog
+              visible={toggleKeyDialog}
+              onHide={() => setToggleKeyDialog(!toggleKeyDialog)}
+            />
+          )}
+
           <div className="flex flex-column justify-content-center">
             <div className="col">
               <p className="text-xl text-800 font-bold my-4">Project Name</p>
@@ -180,6 +190,13 @@ function App() {
                   aria-haspopup
                 />
 
+                <Button
+                  type="button"
+                  icon="pi pi-key"
+                  className="p-button-outlined p-button-danger mx-4 px-2"
+                  label="Keys"
+                  onClick={() => setToggleKeyDialog(!toggleKeyDialog)}
+                />
                 <Button
                   label="Add Activity"
                   icon="pi pi-user"
