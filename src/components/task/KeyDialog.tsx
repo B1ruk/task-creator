@@ -2,7 +2,7 @@ import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Dialog } from "primereact/dialog";
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { addKey, removeKey } from "../../store/features/taskActivitySlice";
@@ -44,6 +44,10 @@ export const KeyDialog = ({ onHide, visible }) => {
   const dispatch = useAppDispatch();
 
   const [toggleAddKey, setToggleAddKey] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem('task-keys',JSON.stringify(keys));
+  }, [keys]);
 
   const removeKeyAction = (keyModel) => {
     return (
