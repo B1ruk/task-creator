@@ -1,6 +1,7 @@
 import "primeicons/primeicons.css";
 import { Button } from "primereact/button";
 import { Column } from "primereact/column";
+import { DataTable } from "primereact/datatable";
 import { InputText } from "primereact/inputtext";
 import { Menu } from "primereact/menu";
 import "primereact/resources/primereact.min.css";
@@ -18,13 +19,14 @@ import { updateTask } from "./store/features/taskActivitySlice";
 import { useAppDispatch, useAppSelector } from "./store/store";
 
 function App() {
-  const [nodes, setNodes] = useState({ root: [] });
-
   const taskActivities: TaskActivityModel[] = useAppSelector(
     (s) => s.taskActivity.taskActivities
   );
 
+  const [parentTasks, setParentTasks] = useState([]);
+
   const menu = useRef(null);
+  const subTaskMenu = useRef(null);
 
   const [addTaskToggle, setAddTaskToggle] = useState(false);
   const [taskParentNode, setTaskParentNode] = useState(0);
@@ -52,10 +54,13 @@ function App() {
   useEffect(() => {
     const treeData = mapTaskActivityToTree(taskActivities);
 
-    localStorage.setItem("task-data", JSON.stringify(taskActivities));
+    const parents = taskActivities.filter(
+      (activity) => activity.parentId === 0
+    );
 
-    console.log(treeData);
-    setNodes({ root: treeData });
+    setParentTasks(parents);
+
+    localStorage.setItem("task-data", JSON.stringify(taskActivities));
   }, [taskActivities]);
 
   const addSubTask = () => {
@@ -74,6 +79,11 @@ function App() {
       command: () => addSubTask(),
     },
     {
+      label: "View Tasks",
+      icon: "pi pi-list",
+      command: () => navigate(`/taskList/${taskParentNode}`),
+    },
+    {
       label: "Add Activity",
       icon: "pi pi-pencil",
       command: () => addSubActivity(),
@@ -86,15 +96,36 @@ function App() {
     },
   ];
 
-  const userAction = (taskActivityRowData) => {
+  const subTaskUserActionItems = [
+    {
+      label: "View Report",
+      icon: "pi pi-chart-pie",
+      command: () =>
+        navigate(`activityReport/${taskParentNode}?name=${taskTitle}`),
+    },
+  ];
+
+  const taskNameView = (taskRowData: TaskActivityModel) => {
+    return (
+      <span className={`${taskRowData.isActivity ? "text-pink-600" : ""}`}>
+        {taskRowData.name}
+      </span>
+    );
+  };
+
+  const userAction = (taskActivityRowData: TaskActivityModel) => {
     return (
       <Button
         icon="pi pi-ellipsis-v"
         className="p-button-outlined text-500 border-0"
         onClick={(event) => {
-          setTaskParentNode(taskActivityRowData.data.modelId);
-          setTaskTitle(taskActivityRowData.data.name);
-          menu.current.toggle(event);
+          setTaskParentNode(taskActivityRowData.modelId);
+          setTaskTitle(taskActivityRowData.name);
+          if (!taskActivityRowData.isActivity) {
+            menu.current.toggle(event);
+          } else {
+            subTaskMenu.current.toggle(event);
+          }
         }}
         aria-controls="popup_menu"
         aria-haspopup
@@ -168,6 +199,14 @@ function App() {
             onShow={onShow}
           />
 
+          <Menu
+            model={subTaskUserActionItems}
+            popup
+            ref={subTaskMenu}
+            id="popup_menu"
+            onShow={onShow}
+          />
+
           {toggleKeyDialog && (
             <KeyDialog
               visible={toggleKeyDialog}
@@ -184,7 +223,7 @@ function App() {
                 <Button
                   label="Add Task"
                   icon="pi pi-user"
-                  className="p-button-success mb-2"
+                  className="p-button-success p-button-sm mb-2"
                   onClick={() => addTaskOnClick()}
                   aria-controls="popup_menu"
                   aria-haspopup
@@ -193,14 +232,14 @@ function App() {
                 <Button
                   type="button"
                   icon="pi pi-key"
-                  className="p-button-outlined p-button-danger mx-4 px-2"
-                  label="Keys"
+                  className="p-button-outlined p-button-sm p-button-danger mx-4"
+                  label="Cost Code"
                   onClick={() => setToggleKeyDialog(!toggleKeyDialog)}
                 />
                 <Button
                   label="Add Activity"
                   icon="pi pi-user"
-                  className="p-button-outlined mb-2 text-600"
+                  className="p-button-outlined p-button-sm mb-2 text-600"
                   onClick={() => addActivityOnClick()}
                   aria-controls="popup_menu"
                   aria-haspopup
@@ -208,19 +247,13 @@ function App() {
               </div>
               <div>
                 <div className="card">
-                  <h5>Basic</h5>
+                  <p className="text-xl">Tasks</p>
 
-                  <TreeTable value={nodes.root}>
-                    <Column
-                      field="name"
-                      header="Name"
-                      expander
-                      editor={typeEditor}
-                    ></Column>
-                    <Column field="projectId" header="Name"></Column>
-                    <Column field="modelId" header="TaskId"></Column>
-                    <Column header="Action" body={userAction}></Column>
-                  </TreeTable>
+                  <DataTable size="small" scrollable value={parentTasks}>
+                    <Column header="Name" body={taskNameView} />
+                    <Column header="Cost Code" field="key" />
+                    <Column header="Action" body={userAction} />
+                  </DataTable>
                 </div>
               </div>
             </div>

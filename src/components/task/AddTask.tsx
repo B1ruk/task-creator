@@ -18,14 +18,15 @@ export const AddTaskDialog = ({
 
   const dispatch = useAppDispatch();
 
-
-  const keys = useAppSelector((state) => state.taskActivity.keys);
+  const keys = useAppSelector((state) =>
+    state.taskActivity.keys.map((data) => data.costCode)
+  );
 
   const addTaskOnClick = () => {
     dispatch(
       addTask({
         isActivity: isActivity,
-        modelId: key,
+        modelId: Math.floor(Math.random() * 1000),
         name: name,
         parentId: taskParentId ? taskParentId : 0,
         projectId: projectId,
@@ -48,25 +49,23 @@ export const AddTaskDialog = ({
         <div className="field ml-4">
           <label className="">Name</label>
 
-          <ControlledInput onUpdate={(val) => setName(val)} type={"text"} defaultValue={""}/>
+          <ControlledInput
+            onUpdate={(val) => setName(val)}
+            type={"text"}
+            defaultValue={""}
+          />
         </div>
 
         <div className="field ml-4">
-          <label className="">Key</label>
+          <label className="">Cost Code</label>
 
-          <Dropdown 
-           value={key}
-           options={keys}
-           onChange={e=>setKey(e.value)}
+          <Dropdown
+            value={key}
+            options={keys}
+            onChange={(e) => setKey(e.value)}
           />
 
           {/* <ControlledInput onUpdate={(val) => setKey(val)} type={"text"} defaultValue={""}/> */}
-        </div>
-
-        <div className="field ml-4">
-          <label className="">ProjectId</label>
-
-          <ControlledInput onUpdate={(val) => setProjectId(val)} type={"text"} defaultValue={""}/>
         </div>
 
         <Button

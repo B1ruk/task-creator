@@ -8,7 +8,12 @@ import {
 
 export interface TaskActivityState {
   taskActivities: TaskActivityModel[];
-  keys: string[];
+  keys: CostCode[];
+}
+
+export interface CostCode {
+  costCode: string;
+  description: string;
 }
 
 export interface ActivityPayLoad {
@@ -65,13 +70,15 @@ export const taskActivitySlice = createSlice({
         ];
       }
     },
-    addKey: (state, action: PayloadAction<string>) => {
-      if (!state.keys.find((key) => key === action.payload)) {
+    addKey: (state, action: PayloadAction<CostCode>) => {
+      if (!state.keys.find((key) => key.costCode === action.payload.costCode)) {
         state.keys = [...state.keys, action.payload];
       }
     },
-    removeKey: (state, action: PayloadAction<string>) => {
-      state.keys = state.keys.filter((key) => key !== action.payload);
+    removeKey: (state, action: PayloadAction<CostCode>) => {
+      state.keys = state.keys.filter(
+        (key) => key.costCode !== action.payload.costCode
+      );
     },
 
     addLaborCost: (state, action: PayloadAction<LaborCostPayLoad>) => {
@@ -117,7 +124,7 @@ export const {
   addLaborCost,
   addEquipmentCost,
   addKey,
-  removeKey
+  removeKey,
 } = taskActivitySlice.actions;
 
 export default taskActivitySlice.reducer;
