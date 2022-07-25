@@ -1,5 +1,5 @@
 export interface TaskActivityModel {
-  key: number;
+  key: number|string;
   projectId?: number;
   name: string;
   parentId: number;

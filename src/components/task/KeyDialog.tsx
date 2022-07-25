@@ -30,13 +30,13 @@ export const AddKeyDialog = ({ onHide, visible }) => {
       <FormInput
         defaultValue={description}
         onUpdate={(data) => setDiscription(data)}
-        labelName="Description"
+        labelName="Activity"
       />
 
       <Button
         type="button"
         icon="pi pi-key"
-        label="Add Key"
+        label="Add Cost Code"
         className="p-button-success p-button-outlined my-2 p-button-sm"
         onClick={(event) => {
           dispatch(addKey({ costCode: key, description: description }));
@@ -99,7 +99,7 @@ export const KeyDialog = ({ onHide, visible }) => {
       />
       <DataTable value={keys} stripedRows size="small">
         <Column header="Cost Code" field="costCode" />
-        <Column header="Description" field="description" />
+        <Column header="Activity" field="description" />
         <Column header="Action" body={removeKeyAction} />
       </DataTable>
     </Dialog>

@@ -23,6 +23,8 @@ function App() {
     (s) => s.taskActivity.taskActivities
   );
 
+  const [nodes, setNodes] = useState({ root: [] });
+
   const [parentTasks, setParentTasks] = useState([]);
 
   const menu = useRef(null);
@@ -42,12 +44,8 @@ function App() {
   };
 
   const addTaskOnClick = () => {
+    setIsActivity(false);
     setTaskParentNode(0);
-    toggleModal();
-  };
-
-  const addActivityOnClick = () => {
-    setIsActivity(true);
     toggleModal();
   };
 
@@ -59,6 +57,7 @@ function App() {
     );
 
     setParentTasks(parents);
+    setNodes({ root: treeData });
 
     localStorage.setItem("task-data", JSON.stringify(taskActivities));
   }, [taskActivities]);
@@ -74,17 +73,7 @@ function App() {
 
   const userActionItems = [
     {
-      label: "Add Task",
-      icon: "pi pi-plus",
-      command: () => addSubTask(),
-    },
-    {
-      label: "View Tasks",
-      icon: "pi pi-list",
-      command: () => navigate(`/taskList/${taskParentNode}`),
-    },
-    {
-      label: "Add Activity",
+      label: "Add Sub Activity",
       icon: "pi pi-pencil",
       command: () => addSubActivity(),
     },
@@ -113,15 +102,17 @@ function App() {
     );
   };
 
-  const userAction = (taskActivityRowData: TaskActivityModel) => {
+  const userAction = (taskActivityRowData) => {
     return (
       <Button
         icon="pi pi-ellipsis-v"
         className="p-button-outlined text-500 border-0"
         onClick={(event) => {
-          setTaskParentNode(taskActivityRowData.modelId);
-          setTaskTitle(taskActivityRowData.name);
-          if (!taskActivityRowData.isActivity) {
+          const { data } = taskActivityRowData;
+          console.log(taskActivityRowData);
+          setTaskParentNode(data.modelId);
+          setTaskTitle(data.name);
+          if (!data.isActivity) {
             menu.current.toggle(event);
           } else {
             subTaskMenu.current.toggle(event);
@@ -216,44 +207,39 @@ function App() {
 
           <div className="flex flex-column justify-content-center">
             <div className="col">
-              <p className="text-xl text-800 font-bold my-4">Project Name</p>
+              {/* <p className="text-xl text-800 font-bold my-4">Project Name</p> */}
             </div>
             <div className="col">
-              <div className="my-4 flex flex-row column-gap-3 justify-content-evenly">
+              <div className="my-4 flex flex-row justify-content-evenly">
                 <Button
-                  label="Add Task"
+                  label="Add Activity"
                   icon="pi pi-user"
-                  className="p-button-success p-button-sm mb-2"
+                  className="p-button-outlined p-button-success p-button-sm"
                   onClick={() => addTaskOnClick()}
                   aria-controls="popup_menu"
                   aria-haspopup
                 />
-
                 <Button
                   type="button"
                   icon="pi pi-key"
-                  className="p-button-outlined p-button-sm p-button-danger mx-4"
+                  className="p-button-outlined p-button-sm p-button-secondary"
                   label="Cost Code"
                   onClick={() => setToggleKeyDialog(!toggleKeyDialog)}
                 />
-                <Button
-                  label="Add Activity"
-                  icon="pi pi-user"
-                  className="p-button-outlined p-button-sm mb-2 text-600"
-                  onClick={() => addActivityOnClick()}
-                  aria-controls="popup_menu"
-                  aria-haspopup
-                />
               </div>
               <div>
-                <div className="card">
-                  <p className="text-xl">Tasks</p>
+                <div className="card mx-8" >
+                  <p className="text-xl">Activities</p>
 
-                  <DataTable size="small" scrollable value={parentTasks}>
-                    <Column header="Name" body={taskNameView} />
-                    <Column header="Cost Code" field="key" />
-                    <Column header="Action" body={userAction} />
-                  </DataTable>
+                  <TreeTable value={nodes.root}>
+                    <Column
+                      field="name"
+                      header="Name"
+                      expander
+                      editor={typeEditor}
+                    ></Column>
+                    <Column header="Action" body={userAction}></Column>
+                  </TreeTable>
                 </div>
               </div>
             </div>
