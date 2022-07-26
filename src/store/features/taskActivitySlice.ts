@@ -5,6 +5,16 @@ import {
   MaterialCost,
   TaskActivityModel,
 } from "../../model/TaskActivityModel";
+import { costCodes } from "./init/costCodes";
+
+const loadInitCostCodes=(): CostCode[] =>{
+  return costCodes.map(c => {
+    return {
+      costCode: c.costCode,
+      description: c.Description
+    }}
+    );
+  }
 
 export interface TaskActivityState {
   taskActivities: TaskActivityModel[];
@@ -33,7 +43,7 @@ export interface EquipmentCostPayLoad {
 
 const initialState: TaskActivityState = {
   taskActivities: JSON.parse(localStorage.getItem("task-data")) || [],
-  keys: JSON.parse(localStorage.getItem("task-keys")) || [],
+  keys: JSON.parse(localStorage.getItem("cost-codes")) || loadInitCostCodes(),
 };
 
 export const taskActivitySlice = createSlice({

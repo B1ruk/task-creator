@@ -56,7 +56,7 @@ export const KeyDialog = ({ onHide, visible }) => {
   const [toggleAddKey, setToggleAddKey] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem("task-keys", JSON.stringify(keys));
+    localStorage.setItem("cost-codes", JSON.stringify(keys));
   }, [keys]);
 
   const removeKeyAction = (keyModel) => {

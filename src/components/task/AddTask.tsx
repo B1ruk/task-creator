@@ -20,7 +20,12 @@ export const AddTaskDialog = ({
   const dispatch = useAppDispatch();
 
   const keys = useAppSelector((state) =>
-    state.taskActivity.keys.map((data) => data.costCode.concat(" ").concat(data.description))
+    state.taskActivity.keys.map((data) => {
+      return {
+        label: data.costCode.concat(" - ").concat(data.description),
+        value: data.costCode,
+      };
+    })
   );
 
   const addTaskOnClick = () => {
@@ -28,7 +33,7 @@ export const AddTaskDialog = ({
       addTask({
         isActivity: isActivity,
         modelId: Math.floor(Math.random() * 1000),
-        name: !isActivity ? name : keys.find(k=>k==key),
+        name: !isActivity ? name : keys.find((k) => k.value == key).label,
         parentId: taskParentId ? taskParentId : 0,
         projectId: projectId,
         key: key,
@@ -68,14 +73,18 @@ export const AddTaskDialog = ({
             <Dropdown
               value={key}
               options={keys}
-              onChange={(e) => setKey(e.value)}
+              filter
+              onChange={(e) => {
+                console.log(e.value);
+                setKey(e.value);
+              }}
             />
 
             {/* <ControlledInput onUpdate={(val) => setKey(val)} type={"text"} defaultValue={""}/> */}
           </div>
         )}
 
-        <Divider/>
+        <Divider />
 
         <Button
           label={`${isActivity ? "Add Sub-Activity" : "Add Activity"}`}
