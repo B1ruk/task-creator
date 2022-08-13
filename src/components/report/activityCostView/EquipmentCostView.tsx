@@ -9,6 +9,8 @@ import { AddEquipmentCostDialog } from "./AddEquipmentCost";
 export const EquipmentCostView = ({ modelId }) => {
   const [modalToggle, setModalToggle] = useState(false);
 
+  const [isParent, setIsParent] = useState(false);
+
   const taskActivities = useAppSelector(
     (state) => state.taskActivity.taskActivities
   );
@@ -19,8 +21,18 @@ export const EquipmentCostView = ({ modelId }) => {
   };
 
   useEffect(() => {
+    const selectedTask = taskActivities.find(
+      (task) => task.modelId == +modelId
+    );
+
+    setIsParent(selectedTask ? !selectedTask.isActivity : false);
+    const isParentTask = selectedTask ? !selectedTask.isActivity : false;
     const equipments = taskActivities
-      .filter((taskActivity) => taskActivity.modelId == modelId)
+      .filter(
+        (taskActivity) =>
+          taskActivity.modelId == modelId ||
+          (isParentTask ? taskActivity.parentId == +modelId : false)
+      )
       .flatMap((taskActivity) => taskActivity.equipmentCosts);
 
     setEquipmentCosts(equipments);
@@ -29,7 +41,13 @@ export const EquipmentCostView = ({ modelId }) => {
   return (
     <div>
       <p className="font-bold text-lg">Equipment Cost</p>
-      <DefaultBtn callBack={toggleModal} name={"Add Equipment Cost"} style={""}/>
+      {!isParent && (
+        <DefaultBtn
+          callBack={toggleModal}
+          name={"Add Equipment Cost"}
+          style={""}
+        />
+      )}
 
       {modalToggle && (
         <AddEquipmentCostDialog
@@ -40,9 +58,9 @@ export const EquipmentCostView = ({ modelId }) => {
       )}
 
       <DataTable value={equipmentCosts}>
-        <Column field="TypeofEquipment" header="Type Of Equipment"/>
-        <Column field="no" header="No"/>
-        <Column field="dailyCost" header="Daily Cost"/>
+        <Column field="TypeofEquipment" header="Type Of Equipment" />
+        <Column field="no" header="No" />
+        <Column field="dailyCost" header="Daily Cost" />
       </DataTable>
     </div>
   );

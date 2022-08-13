@@ -15,6 +15,8 @@ export const TaskActivityReport = () => {
 
   const [taskChartData, setTaskChartData] = useState({});
 
+  const [isParent, setIsParent] = useState(false);
+
   const taskActivities = useAppSelector(
     (state) => state.taskActivity.taskActivities
   );
@@ -34,28 +36,43 @@ export const TaskActivityReport = () => {
   }, [queryParams]);
 
   useEffect(() => {
+    const selectedTask = taskActivities.find(
+      (task) => task.modelId == +params.modelId
+    );
+
+    console.log(selectedTask);
+    const isParentTask=selectedTask ? !selectedTask.isActivity : false;
+    setIsParent(selectedTask ? !selectedTask.isActivity : false);
+
     const materialCost = taskActivities
-      .filter((taskModel) => taskModel.modelId == +params.modelId)
+      .filter(
+        (taskModel) =>
+          taskModel.modelId == +params.modelId ||
+          (isParentTask ? taskModel.parentId == +params.modelId : false)
+      )
       .flatMap((taskActivity) => taskActivity.materialCosts)
       .filter((materialCost) => {
-        console.log(
-          `isFinite  for ${materialCost.price} => ${Number.isFinite(
-            +materialCost.price
-          )}`
-        );
         return Number.isFinite(+materialCost.price);
       })
       .map((materialCost) => materialCost.price * materialCost.qty)
       .reduce((m1, m2) => m1 + m2, 0);
 
     const laborCost = taskActivities
-      .filter((taskModel) => taskModel.modelId == +params.modelId)
+      .filter(
+        (taskModel) =>
+          taskModel.modelId == +params.modelId ||
+          (isParentTask ? taskModel.parentId == +params.modelId : false)
+      )
       .flatMap((taskActivity) => taskActivity.laborCosts)
       .map((materialCost) => materialCost.price * materialCost.qty)
       .reduce((m1, m2) => m1 + m2, 0);
 
     const equipmentCost = taskActivities
-      .filter((taskModel) => taskModel.modelId == +params.modelId)
+      .filter(
+        (taskModel) =>
+          taskModel.modelId == +params.modelId ||
+          (isParentTask ? taskModel.parentId == +params.modelId : false)
+      )
       .flatMap((taskActivity) => taskActivity.equipmentCosts)
       .map((materialCost) => +materialCost.dailyCost)
       .reduce((m1, m2) => m1 + m2, 0);

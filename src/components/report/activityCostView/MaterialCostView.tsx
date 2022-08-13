@@ -1,16 +1,14 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Divider } from "primereact/divider";
 import { Button } from "primereact/button";
-import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
+import { DataTable } from "primereact/datatable";
 import { Toast } from "primereact/toast";
+import { useEffect, useRef, useState } from "react";
+import {
+  LaborCost,
+  MaterialCost
+} from "../../../model/TaskActivityModel";
 import { useAppSelector } from "../../../store/store";
 import { AddMaterialCost } from "../../task/activity/AddMaterialCost";
-import {
-  EquipmentCost,
-  LaborCost,
-  MaterialCost,
-} from "../../../model/TaskActivityModel";
 
 export const MaterialCostView = ({
   isMaterial,
@@ -32,24 +30,47 @@ export const MaterialCostView = ({
     (state) => state.taskActivity.taskActivities
   );
 
+  const [isParent, setIsParent] = useState(false);
+
   useEffect(() => {
     let materialList: MaterialCost[] = [];
     let laborCostList: LaborCost[] = [];
 
+    const selectedTask = taskActivities.find(
+      (task) => task.modelId == +modelId
+    );
+
+    setIsParent(selectedTask ? !selectedTask.isActivity : false);
+    const isParentTask = selectedTask ? !selectedTask.isActivity : false;
     if (isMaterial) {
       materialList = taskActivities
-        .filter((task) => task.modelId == modelId)
-        .flatMap((taskActivity) => taskActivity.materialCosts);
+        .filter(
+          (task) =>
+            task.modelId == modelId ||
+            (isParentTask ? task.parentId == +modelId : false)
+        )
+        .flatMap((taskActivity) => taskActivity.materialCosts)
+        .filter((materialCost) => {
+          return Number.isFinite(+materialCost.price);
+        });
     } else {
       laborCostList = taskActivities
-        .filter((task) => task.modelId == modelId)
-        .flatMap((taskActivity) => taskActivity.laborCosts);
+        .filter(
+          (task) =>
+            task.modelId == modelId ||
+            (isParentTask ? task.parentId == +modelId : false)
+        )
+        .flatMap((taskActivity) => taskActivity.laborCosts)
+        .filter((materialCost) => {
+          return Number.isFinite(+materialCost.price);
+        });
     }
 
     const total = (isMaterial ? materialList : laborCostList)
-      .map((costModel) => costModel.price * costModel.qty)
+      .map((costModel) => +costModel.price * +costModel.qty)
       .reduce((m1, m2) => m1 + m2, 0);
 
+    console.log(total);
     if (total > 0 && toast && toast.current) {
       toast.current.show({ severity: "success", summary: "success" });
     }
@@ -87,13 +108,15 @@ export const MaterialCostView = ({
         />
       )}
 
-      <Button
-        label={modalTitle}
-        className="p-button-success my-2"
-        onClick={() => AddMaterialCostOnClick()}
-        aria-controls="popup_menu"
-        aria-haspopup
-      />
+      {!isParent && (
+        <Button
+          label={modalTitle}
+          className="p-button-success my-2"
+          onClick={() => AddMaterialCostOnClick()}
+          aria-controls="popup_menu"
+          aria-haspopup
+        />
+      )}
 
       <DataTable value={isMaterial ? materialCosts : laborCosts}>
         <Column header="Name" field="name" />
