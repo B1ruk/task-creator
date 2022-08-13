@@ -37,6 +37,14 @@ export const TaskActivityReport = () => {
     const materialCost = taskActivities
       .filter((taskModel) => taskModel.modelId == +params.modelId)
       .flatMap((taskActivity) => taskActivity.materialCosts)
+      .filter((materialCost) => {
+        console.log(
+          `isFinite  for ${materialCost.price} => ${Number.isFinite(
+            +materialCost.price
+          )}`
+        );
+        return Number.isFinite(+materialCost.price);
+      })
       .map((materialCost) => materialCost.price * materialCost.qty)
       .reduce((m1, m2) => m1 + m2, 0);
 
@@ -46,24 +54,25 @@ export const TaskActivityReport = () => {
       .map((materialCost) => materialCost.price * materialCost.qty)
       .reduce((m1, m2) => m1 + m2, 0);
 
-      const equipmentCost=taskActivities
+    const equipmentCost = taskActivities
       .filter((taskModel) => taskModel.modelId == +params.modelId)
       .flatMap((taskActivity) => taskActivity.equipmentCosts)
       .map((materialCost) => +materialCost.dailyCost)
       .reduce((m1, m2) => m1 + m2, 0);
 
-      const equipment=taskActivities
+    const equipment = taskActivities
       .filter((taskModel) => taskModel.modelId == +params.modelId)
       .flatMap((taskActivity) => taskActivity.equipmentCosts)
+      .filter((materialCost) => Number.isFinite(materialCost.price))
       .map((materialCost) => materialCost.dailyCost);
-      console.log(equipment);
-      console.log(`EquipmentCost => ${equipmentCost}`);
+
+    console.log(`materialCost => ${materialCost}`);
 
     setTaskChartData({
       labels: ["Equipment Cost", "Material Cost", "Labor Cost"],
       datasets: [
         {
-          data: [equipmentCost,materialCost,laborCost],
+          data: [equipmentCost, materialCost, laborCost],
           backgroundColor: ["#AF4384", "#36A2EB", "#FFCE56"],
           hoverBackgroundColor: ["#AF4384", "#36A2EB", "#FFCE56"],
         },

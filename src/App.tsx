@@ -15,8 +15,10 @@ import { AddTaskDialog } from "./components/task/AddTask";
 import { KeyDialog } from "./components/task/KeyDialog";
 import { mapTaskActivityToTree } from "./model/model-tree";
 import { TaskActivityModel } from "./model/TaskActivityModel";
-import { updateTask } from "./store/features/taskActivitySlice";
+import { removeTask, updateTask } from "./store/features/taskActivitySlice";
 import { useAppDispatch, useAppSelector } from "./store/store";
+import { ConfirmDialog } from "primereact/confirmdialog"; // To use <ConfirmDialog> tag
+import { confirmDialog } from "primereact/confirmdialog"; // To use confirmDialog method
 
 function App() {
   const taskActivities: TaskActivityModel[] = useAppSelector(
@@ -58,17 +60,26 @@ function App() {
 
     setParentTasks(parents);
     setNodes({ root: treeData });
-
-    localStorage.setItem("task-data", JSON.stringify(taskActivities));
   }, [taskActivities]);
-
-  const addSubTask = () => {
-    toggleModal();
-  };
 
   const addSubActivity = () => {
     setIsActivity(true);
     toggleModal();
+  };
+
+  const removeActivity = () => {
+    console.log(`remove rowData ${taskParentNode}`);
+    appDispatch(removeTask(taskParentNode));
+  };
+
+  const confirmTaskRemoval = () => {
+    confirmDialog({
+      message: `Are you sure you want to Remove ?`,
+      header: "Confirmation",
+      icon: "pi pi-exclamation-triangle",
+      accept: () => removeActivity(),
+      reject: () => {},
+    });
   };
 
   const userActionItems = [
@@ -76,6 +87,13 @@ function App() {
       label: "Add Sub Activity",
       icon: "pi pi-pencil",
       command: () => addSubActivity(),
+    },
+    {
+      label: "Remove Activity",
+      icon: "pi pi-trash",
+      command: () => {
+        confirmTaskRemoval();
+      },
     },
     {
       label: "View Report",
@@ -91,6 +109,13 @@ function App() {
       icon: "pi pi-chart-pie",
       command: () =>
         navigate(`activityReport/${taskParentNode}?name=${taskTitle}`),
+    },
+    {
+      label: "Remove Sub Activity",
+      icon: "pi pi-trash",
+      command: () => {
+        confirmTaskRemoval();
+      },
     },
   ];
 
@@ -172,6 +197,7 @@ function App() {
   };
   return (
     <>
+      <ConfirmDialog />
       <div className="bg-gray-100 h-screen w-screen">
         <div className="bg-white mt-4 mx-6 px-8">
           {addTaskToggle && (
@@ -228,7 +254,7 @@ function App() {
                 />
               </div>
               <div>
-                <div className="card mx-8" >
+                <div className="card mx-8">
                   <p className="text-xl">Activities</p>
 
                   <TreeTable value={nodes.root}>

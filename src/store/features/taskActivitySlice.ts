@@ -7,14 +7,14 @@ import {
 } from "../../model/TaskActivityModel";
 import { costCodes } from "./init/costCodes";
 
-const loadInitCostCodes=(): CostCode[] =>{
-  return costCodes.map(c => {
+const loadInitCostCodes = (): CostCode[] => {
+  return costCodes.map((c) => {
     return {
       costCode: c.costCode,
-      description: c.Description
-    }}
-    );
-  }
+      description: c.Description,
+    };
+  });
+};
 
 export interface TaskActivityState {
   taskActivities: TaskActivityModel[];
@@ -53,6 +53,11 @@ export const taskActivitySlice = createSlice({
     addTask: (state, action: PayloadAction<TaskActivityModel>) => {
       state.taskActivities = [...state.taskActivities, action.payload];
     },
+    removeTask: (state, action: PayloadAction<number>) => {
+      state.taskActivities = state.taskActivities.filter(
+        (task) => action.payload !== task.modelId
+      );
+    },
     updateTask: (state, action: PayloadAction<TaskActivityModel>) => {
       const taskIndex = findTaskIndex(
         state.taskActivities,
@@ -63,7 +68,6 @@ export const taskActivitySlice = createSlice({
         state.taskActivities[taskIndex].name = action.payload.name;
       }
     },
-    removeTask: (state, action: PayloadAction<TaskActivityModel>) => {},
     addMaterialCost: (state, action: PayloadAction<ActivityPayLoad>) => {
       const taskIndex = findTaskIndex(
         state.taskActivities,

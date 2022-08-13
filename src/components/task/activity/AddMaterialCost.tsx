@@ -33,7 +33,7 @@ export const AddMaterialCost = ({
       appDispatch(addMaterialCost(cost));
     } else {
         appDispatch(addLaborCost({
-            modelId: 2,
+            modelId ,
             laborCost: {
               name,
               price,

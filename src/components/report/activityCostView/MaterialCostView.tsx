@@ -50,7 +50,7 @@ export const MaterialCostView = ({
       .map((costModel) => costModel.price * costModel.qty)
       .reduce((m1, m2) => m1 + m2, 0);
 
-    if (total > 0) {
+    if (total > 0 && toast && toast.current) {
       toast.current.show({ severity: "success", summary: "success" });
     }
 
