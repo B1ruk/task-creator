@@ -6,6 +6,7 @@ import { Chart } from "primereact/chart";
 import { useAppSelector } from "../../store/store";
 import { Button } from "primereact/button";
 import { EquipmentCostView } from "./activityCostView/EquipmentCostView";
+import { BudgetReport } from "../task/activity/budget/BudgetReport";
 
 export const TaskActivityReport = () => {
   const params = useParams();
@@ -16,6 +17,10 @@ export const TaskActivityReport = () => {
   const [taskChartData, setTaskChartData] = useState({});
 
   const [isParent, setIsParent] = useState(false);
+
+  const [equipmentCostTotal, setequipmentCostTotal] = useState();
+  const [materialCostTotal, setmaterialCostTotal] = useState();
+  const [laborCostTotal, setlabortCostTotal] = useState();
 
   const taskActivities = useAppSelector(
     (state) => state.taskActivity.taskActivities
@@ -41,7 +46,7 @@ export const TaskActivityReport = () => {
     );
 
     console.log(selectedTask);
-    const isParentTask=selectedTask ? !selectedTask.isActivity : false;
+    const isParentTask = selectedTask ? !selectedTask.isActivity : false;
     setIsParent(selectedTask ? !selectedTask.isActivity : false);
 
     const materialCost = taskActivities
@@ -84,6 +89,10 @@ export const TaskActivityReport = () => {
       .map((materialCost) => materialCost.dailyCost);
 
     console.log(`materialCost => ${materialCost}`);
+
+    setequipmentCostTotal(equipmentCost ? equipmentCost : 0);
+    setmaterialCostTotal(materialCost ? materialCost : 0);
+    setlabortCostTotal(laborCost ? laborCost : 0);
 
     setTaskChartData({
       labels: ["Equipment Cost", "Material Cost", "Labor Cost"],
@@ -132,6 +141,14 @@ export const TaskActivityReport = () => {
                     options={lightOptions}
                     className="align-self-center "
                     style={{ width: "40%" }}
+                  />
+
+                  <BudgetReport
+                    modelId={params.modelId}
+                    isParent={isParent}
+                    LaborCost={laborCostTotal}
+                    equipmentCost={equipmentCostTotal}
+                    materialCost={materialCostTotal}
                   />
 
                   <Button

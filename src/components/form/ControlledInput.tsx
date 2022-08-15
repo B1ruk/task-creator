@@ -15,7 +15,7 @@ export function ControlledInput({ onUpdate, type,defaultValue }) {
       type={inputType}
       value={value}
       onChange={handleChange}
-      className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary"
+      className="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none ml-4 focus:border-primary"
     />
   );
 }

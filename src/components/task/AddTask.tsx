@@ -16,6 +16,7 @@ export const AddTaskDialog = ({
   const [projectId, setProjectId] = useState(0);
   const [key, setKey] = useState("");
   const [name, setName] = useState("");
+  const [budget,setBudget]=useState();
 
   const dispatch = useAppDispatch();
 
@@ -40,6 +41,7 @@ export const AddTaskDialog = ({
         equipmentCosts: [],
         laborCosts: [],
         materialCosts: [],
+        budget:budget
       })
     );
 
@@ -55,15 +57,27 @@ export const AddTaskDialog = ({
     >
       <div className="formgroup-inline flex flex-column">
         {!isActivity && (
-          <div className="field ml-4">
-            <label className="">Name</label>
+          <>
+            <div className="field ml-4">
+              <label className="">Name</label>
 
-            <ControlledInput
-              onUpdate={(val) => setName(val)}
-              type={"text"}
-              defaultValue={""}
-            />
-          </div>
+              <ControlledInput
+                onUpdate={(val) => setName(val)}
+                type={"text"}
+                defaultValue={""}
+              />
+            </div>
+
+            <div className="field ml-4">
+              <label className="">Budget</label>
+
+              <ControlledInput
+                onUpdate={(val) => setBudget(val)}
+                type={"text"}
+                defaultValue={""}
+              />
+            </div>
+          </>
         )}
 
         {isActivity && (

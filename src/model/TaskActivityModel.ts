@@ -5,6 +5,7 @@ export interface TaskActivityModel {
   parentId: number;
   modelId: number;
   isActivity: boolean;
+  budget:number|undefined;
   
   materialCosts: MaterialCost[];
   laborCosts: LaborCost[];

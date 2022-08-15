@@ -264,6 +264,7 @@ function App() {
                       expander
                       editor={typeEditor}
                     ></Column>
+                    <Column header="Budget" field="budget"/>
                     <Column header="Action" body={userAction}></Column>
                   </TreeTable>
                 </div>
