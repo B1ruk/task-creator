@@ -3,10 +3,7 @@ import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { Toast } from "primereact/toast";
 import { useEffect, useRef, useState } from "react";
-import {
-  LaborCost,
-  MaterialCost
-} from "../../../model/TaskActivityModel";
+import { LaborCost, MaterialCost } from "../../../model/TaskActivityModel";
 import { useAppSelector } from "../../../store/store";
 import { AddMaterialCost } from "../../task/activity/AddMaterialCost";
 
@@ -92,6 +89,16 @@ export const MaterialCostView = ({
     toggleModal();
   };
 
+  const removeAction = (data) => {
+    return (
+      <Button
+        icon="pi pi-trash"
+        className="p-button-outlined p-button-sm p-button-danger"
+        onClick={() => console.log(data)}
+      />
+    );
+  };
+
   return (
     <div>
       <p className="font-bold text-lg">{title}</p>
@@ -123,11 +130,12 @@ export const MaterialCostView = ({
         <Column header="Price" field="price" />
         <Column header="Unit" field="unit" />
         <Column header="Qty" field="qty" />
+        <Column header="Action" body={removeAction} />
       </DataTable>
 
       {(isMaterial ? totalCost : laborCostTotal) > 0 && (
         <p className="mt-4 font-bold text-base">
-          Total Amount {isMaterial ? totalCost : laborCostTotal} Birr
+          Total Amount : {isMaterial ? totalCost : laborCostTotal} Birr
         </p>
       )}
     </div>

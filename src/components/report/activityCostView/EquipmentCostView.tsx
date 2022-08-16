@@ -1,3 +1,4 @@
+import { Button } from "primereact/button";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import React, { useEffect, useState } from "react";
@@ -6,7 +7,7 @@ import { useAppSelector } from "../../../store/store";
 import { DefaultBtn } from "../../form/DefaultBtn";
 import { AddEquipmentCostDialog } from "./AddEquipmentCost";
 
-export const EquipmentCostView = ({ modelId }) => {
+export const EquipmentCostView = ({ modelId,cost }) => {
   const [modalToggle, setModalToggle] = useState(false);
 
   const [isParent, setIsParent] = useState(false);
@@ -19,6 +20,10 @@ export const EquipmentCostView = ({ modelId }) => {
   const toggleModal = () => {
     setModalToggle(!modalToggle);
   };
+
+  const removeAction=(data)=>{
+    return <Button icon="pi pi-trash" className="p-button-outlined p-button-sm p-button-danger" onClick={()=>console.log(data)}/>
+  }
 
   useEffect(() => {
     const selectedTask = taskActivities.find(
@@ -61,7 +66,9 @@ export const EquipmentCostView = ({ modelId }) => {
         <Column field="TypeofEquipment" header="Type Of Equipment" />
         <Column field="no" header="No" />
         <Column field="dailyCost" header="Daily Cost" />
+        <Column header="Action" body={removeAction}/>
       </DataTable>
+      <p className="mt-4 font-semibold text-base">Total Amount :  {cost}</p>
     </div>
   );
 };

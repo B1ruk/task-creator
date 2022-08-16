@@ -7,6 +7,7 @@ import { useAppSelector } from "../../store/store";
 import { Button } from "primereact/button";
 import { EquipmentCostView } from "./activityCostView/EquipmentCostView";
 import { BudgetReport } from "../task/activity/budget/BudgetReport";
+import { TaskActivityModel } from "../../model/TaskActivityModel";
 
 export const TaskActivityReport = () => {
   const params = useParams();
@@ -18,11 +19,13 @@ export const TaskActivityReport = () => {
 
   const [isParent, setIsParent] = useState(false);
 
-  const [equipmentCostTotal, setequipmentCostTotal] = useState();
-  const [materialCostTotal, setmaterialCostTotal] = useState();
-  const [laborCostTotal, setlabortCostTotal] = useState();
+  const [selectedTask, setSelectedTask] = useState<TaskActivityModel>();
 
-  const taskActivities = useAppSelector(
+  const [equipmentCostTotal, setequipmentCostTotal] = useState<number>(0);
+  const [materialCostTotal, setmaterialCostTotal] = useState<number>(0);
+  const [laborCostTotal, setlabortCostTotal] = useState<number>(0);
+
+  const taskActivities: TaskActivityModel[] = useAppSelector(
     (state) => state.taskActivity.taskActivities
   );
 
@@ -45,7 +48,8 @@ export const TaskActivityReport = () => {
       (task) => task.modelId == +params.modelId
     );
 
-    console.log(selectedTask);
+    setSelectedTask(selectedTask);
+
     const isParentTask = selectedTask ? !selectedTask.isActivity : false;
     setIsParent(selectedTask ? !selectedTask.isActivity : false);
 
@@ -69,7 +73,7 @@ export const TaskActivityReport = () => {
           (isParentTask ? taskModel.parentId == +params.modelId : false)
       )
       .flatMap((taskActivity) => taskActivity.laborCosts)
-      .map((materialCost) => materialCost.price * materialCost.qty)
+      .map((materialCost) => +materialCost.price * +materialCost.qty)
       .reduce((m1, m2) => m1 + m2, 0);
 
     const equipmentCost = taskActivities
@@ -79,16 +83,9 @@ export const TaskActivityReport = () => {
           (isParentTask ? taskModel.parentId == +params.modelId : false)
       )
       .flatMap((taskActivity) => taskActivity.equipmentCosts)
-      .map((materialCost) => +materialCost.dailyCost)
+      .filter((equipmentCost) => Number.isFinite(+equipmentCost.dailyCost))
+      .map((equipmentCost) => +equipmentCost.dailyCost)
       .reduce((m1, m2) => m1 + m2, 0);
-
-    const equipment = taskActivities
-      .filter((taskModel) => taskModel.modelId == +params.modelId)
-      .flatMap((taskActivity) => taskActivity.equipmentCosts)
-      .filter((materialCost) => Number.isFinite(materialCost.price))
-      .map((materialCost) => materialCost.dailyCost);
-
-    console.log(`materialCost => ${materialCost}`);
 
     setequipmentCostTotal(equipmentCost ? equipmentCost : 0);
     setmaterialCostTotal(materialCost ? materialCost : 0);
@@ -122,7 +119,10 @@ export const TaskActivityReport = () => {
                 modelId={params.modelId}
               />
               <Divider />
-              <EquipmentCostView modelId={params.modelId} />
+              <EquipmentCostView
+                modelId={params.modelId}
+                cost={equipmentCostTotal}
+              />
               <Divider />
               <MaterialCostView
                 isMaterial={false}
@@ -143,13 +143,15 @@ export const TaskActivityReport = () => {
                     style={{ width: "40%" }}
                   />
 
-                  <BudgetReport
-                    modelId={params.modelId}
-                    isParent={isParent}
-                    LaborCost={laborCostTotal}
-                    equipmentCost={equipmentCostTotal}
-                    materialCost={materialCostTotal}
-                  />
+                  {selectedTask && (
+                    <BudgetReport
+                      modelId={params.modelId}
+                      isParent={!selectedTask.isActivity}
+                      LaborCost={laborCostTotal}
+                      equipmentCost={equipmentCostTotal}
+                      materialCost={materialCostTotal}
+                    />
+                  )}
 
                   <Button
                     icon="pi pi-print"

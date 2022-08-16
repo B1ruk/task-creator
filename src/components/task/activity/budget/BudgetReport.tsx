@@ -14,6 +14,7 @@ export const BudgetReport = ({
     (state) => state.taskActivity.taskActivities
   );
   const [parentTask, setParentTask] = useState<TaskActivityModel>();
+  const totalCost = materialCost + equipmentCost + LaborCost;
 
   useEffect(() => {
     const task = tasks.find((t) => {
@@ -24,7 +25,11 @@ export const BudgetReport = ({
     });
 
     console.log(task);
-    console.log(`modelId=>${modelId} --- isParentTask =>${isParent} budget => ${task?task.budget:0}`);
+    console.log(
+      `modelId=>${modelId} --- isParentTask =>${isParent} budget => ${
+        task ? task.budget : 0
+      }`
+    );
 
     setParentTask(task);
   }, [tasks]);
@@ -32,30 +37,38 @@ export const BudgetReport = ({
   return (
     <>
       <div className="w-4">
-      {parentTask && (
         <div className="flex flex-column">
-          <p className="flex flex-row justify-content-between">
+          <p className="flex flex-row justify-content-between font-semibold">
             <span>Equipment Cost</span>
             <span>{equipmentCost}</span>
           </p>
-          <p className="flex flex-row justify-content-between">
+          <p className="flex flex-row justify-content-between font-semibold">
             <span>Material Cost</span>
             <span>{materialCost}</span>
           </p>
-          <p className="flex flex-row justify-content-between">
+          <p className="flex flex-row justify-content-between font-semibold">
             <span>Labor Cost</span>
             <span>{LaborCost}</span>
           </p>
-          <p className="flex flex-row justify-content-between">
+          <p className="flex flex-row justify-content-between font-semibold">
             <span>Total Cost</span>
-            <span>{materialCost + equipmentCost + LaborCost}</span>
+            <span>{totalCost}</span>
           </p>
-            <p className="flex flex-row justify-content-between">
-              <span>Budget</span>
-              <span>{parentTask?.budget}</span>
-            </p>
+          {parentTask && (
+            <>
+              <p className="flex flex-row justify-content-between font-semibold">
+                <span>Budget</span>
+                <span>{parentTask?.budget}</span>
+              </p>
+
+              {parentTask?.budget < totalCost && (
+                <p className="text-pink-500 font-semibold">
+                  Budget overflow by {totalCost - parentTask?.budget} Birr{" "}
+                </p>
+              )}
+            </>
+          )}
         </div>
-      )}
       </div>
     </>
   );
