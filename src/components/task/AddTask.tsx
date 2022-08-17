@@ -41,6 +41,7 @@ export const AddTaskDialog = ({
         equipmentCosts: [],
         laborCosts: [],
         materialCosts: [],
+        subContracts:[],
         budget:budget
       })
     );

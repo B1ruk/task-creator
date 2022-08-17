@@ -8,6 +8,7 @@ import { Button } from "primereact/button";
 import { EquipmentCostView } from "./activityCostView/EquipmentCostView";
 import { BudgetReport } from "../task/activity/budget/BudgetReport";
 import { TaskActivityModel } from "../../model/TaskActivityModel";
+import { SubContractView } from "./activityCostView/SubContractView";
 
 export const TaskActivityReport = () => {
   const params = useParams();
@@ -24,6 +25,7 @@ export const TaskActivityReport = () => {
   const [equipmentCostTotal, setequipmentCostTotal] = useState<number>(0);
   const [materialCostTotal, setmaterialCostTotal] = useState<number>(0);
   const [laborCostTotal, setlabortCostTotal] = useState<number>(0);
+  const [subContractTotal, setSubContractTotal] = useState<number>(0);
 
   const taskActivities: TaskActivityModel[] = useAppSelector(
     (state) => state.taskActivity.taskActivities
@@ -66,6 +68,17 @@ export const TaskActivityReport = () => {
       .map((materialCost) => materialCost.price * materialCost.qty)
       .reduce((m1, m2) => m1 + m2, 0);
 
+    const subContractCost = taskActivities
+      .filter(
+        (taskModel) =>
+          taskModel.modelId == +params.modelId ||
+          (isParentTask ? taskModel.parentId == +params.modelId : false)
+      )
+      .flatMap((taskActivity) => taskActivity.subContracts)
+      .filter(subContract=>subContract.price)
+      .map((subContract) => +subContract.price)
+      .reduce((s1, s2) => s1 + s2, 0);
+
     const laborCost = taskActivities
       .filter(
         (taskModel) =>
@@ -90,14 +103,15 @@ export const TaskActivityReport = () => {
     setequipmentCostTotal(equipmentCost ? equipmentCost : 0);
     setmaterialCostTotal(materialCost ? materialCost : 0);
     setlabortCostTotal(laborCost ? laborCost : 0);
+    setSubContractTotal(subContractCost ? subContractCost : 0);
 
     setTaskChartData({
-      labels: ["Equipment Cost", "Material Cost", "Labor Cost"],
+      labels: ["Equipment Cost", "Material Cost", "Labor Cost","Sub-Contract Cost"],
       datasets: [
         {
-          data: [equipmentCost, materialCost, laborCost],
-          backgroundColor: ["#AF4384", "#36A2EB", "#FFCE56"],
-          hoverBackgroundColor: ["#AF4384", "#36A2EB", "#FFCE56"],
+          data: [equipmentCost, materialCost, laborCost,subContractCost],
+          backgroundColor: ["#AF4384", "#36A2EB", "#FFCE56","#EFEFEF"],
+          hoverBackgroundColor: ["#AF4384", "#36A2EB", "#FFCE56","E6E6E6"],
         },
       ],
     });
@@ -130,6 +144,11 @@ export const TaskActivityReport = () => {
                 modalTitle={"Add Labor Cost"}
                 modelId={params.modelId}
               />
+
+              <SubContractView
+                modelId={params.modelId}
+                cost={subContractTotal}
+              />
             </div>
 
             <div className="col-5 flex flex-column align-items-center justify-content-center">
@@ -150,6 +169,7 @@ export const TaskActivityReport = () => {
                       LaborCost={laborCostTotal}
                       equipmentCost={equipmentCostTotal}
                       materialCost={materialCostTotal}
+                      subContract={subContractTotal}
                     />
                   )}
 

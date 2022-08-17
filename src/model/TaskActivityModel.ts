@@ -10,6 +10,7 @@ export interface TaskActivityModel {
   materialCosts: MaterialCost[];
   laborCosts: LaborCost[];
   equipmentCosts: EquipmentCost[]
+  subContracts:SubContract[];
 }
 
 export interface ActivityCost {
@@ -23,6 +24,11 @@ export interface MaterialCost {
   price: number;
   unit?: string;
   qty: number;
+}
+
+export interface SubContract{
+  name:string;
+  price:string;
 }
 
 export interface LaborCost {

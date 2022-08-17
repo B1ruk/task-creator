@@ -9,12 +9,13 @@ export const BudgetReport = ({
   materialCost,
   equipmentCost,
   LaborCost,
+  subContract,
 }) => {
   const tasks: TaskActivityModel[] = useAppSelector(
     (state) => state.taskActivity.taskActivities
   );
   const [parentTask, setParentTask] = useState<TaskActivityModel>();
-  const totalCost = materialCost + equipmentCost + LaborCost;
+  const totalCost = materialCost + equipmentCost + LaborCost+subContract;
 
   useEffect(() => {
     const task = tasks.find((t) => {
@@ -49,6 +50,10 @@ export const BudgetReport = ({
           <p className="flex flex-row justify-content-between font-semibold">
             <span>Labor Cost</span>
             <span>{LaborCost}</span>
+          </p>
+          <p className="flex flex-row justify-content-between font-semibold">
+            <span>Sub-Contract Cost</span>
+            <span>{subContract}</span>
           </p>
           <p className="flex flex-row justify-content-between font-semibold">
             <span>Total Cost</span>

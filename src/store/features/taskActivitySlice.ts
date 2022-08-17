@@ -3,7 +3,8 @@ import {
   EquipmentCost,
   LaborCost,
   MaterialCost,
-  TaskActivityModel
+  SubContract,
+  TaskActivityModel,
 } from "../../model/TaskActivityModel";
 import { costCodes } from "./init/costCodes";
 
@@ -36,6 +37,11 @@ export interface LaborCostPayLoad {
   laborCost: LaborCost;
 }
 
+export interface SubContractPayLoad {
+  modelId: number;
+  subContract: SubContract;
+}
+
 export interface EquipmentCostPayLoad {
   modelId: number;
   equipmentCost: EquipmentCost;
@@ -66,6 +72,42 @@ export const taskActivitySlice = createSlice({
 
       if (taskIndex >= 0) {
         state.taskActivities[taskIndex].name = action.payload.name;
+      }
+    },
+    addSubContract: (state, action: PayloadAction<SubContractPayLoad>) => {
+      const taskIndex = findTaskIndex(
+        state.taskActivities,
+        action.payload.modelId
+      );
+
+      if (taskIndex >= 0) {
+        const subContractModel = action.payload;
+        const subContracts = state.taskActivities[taskIndex].subContracts;
+
+        state.taskActivities[taskIndex].subContracts = [
+          ...subContracts,
+          subContractModel.subContract,
+        ];
+      }
+    },
+    removeSubContract: (state, action: PayloadAction<SubContractPayLoad>) => {
+      const taskIndex = findTaskIndex(
+        state.taskActivities,
+        action.payload.modelId
+      );
+
+      if (taskIndex >= 0) {
+        const subContractModel = action.payload.subContract;
+        const subContracts = state.taskActivities[taskIndex].subContracts;
+
+        state.taskActivities[taskIndex].subContracts = subContracts.filter(
+          (subContract) => {
+            return !(
+              subContract.name == subContractModel.name &&
+              subContract.price == subContractModel.price
+            );
+          }
+        );
       }
     },
     addMaterialCost: (state, action: PayloadAction<ActivityPayLoad>) => {
@@ -203,11 +245,13 @@ export const {
   addMaterialCost,
   addLaborCost,
   addEquipmentCost,
+  addSubContract,
   addKey,
   removeKey,
   removeEquipmentCost,
   removeLaborCost,
   removeMaterialCost,
+  removeSubContract,
 } = taskActivitySlice.actions;
 
 export default taskActivitySlice.reducer;
