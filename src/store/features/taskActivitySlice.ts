@@ -3,7 +3,7 @@ import {
   EquipmentCost,
   LaborCost,
   MaterialCost,
-  TaskActivityModel,
+  TaskActivityModel
 } from "../../model/TaskActivityModel";
 import { costCodes } from "./init/costCodes";
 
@@ -84,6 +84,27 @@ export const taskActivitySlice = createSlice({
         ];
       }
     },
+    removeMaterialCost: (state, action: PayloadAction<ActivityPayLoad>) => {
+      const taskIndex = findTaskIndex(
+        state.taskActivities,
+        action.payload.modelId
+      );
+
+      if (taskIndex >= 0) {
+        const materialModel = action.payload.materialCost;
+        const materialCosts = state.taskActivities[
+          taskIndex
+        ].materialCosts.filter((materialCost) => {
+          return !(
+            materialCost.name == materialModel.name &&
+            materialCost.price == materialModel.price &&
+            materialCost.qty == materialModel.qty
+          );
+        });
+
+        state.taskActivities[taskIndex].materialCosts = materialCosts;
+      }
+    },
     addKey: (state, action: PayloadAction<CostCode>) => {
       if (!state.keys.find((key) => key.costCode === action.payload.costCode)) {
         state.keys = [...state.keys, action.payload];
@@ -111,6 +132,27 @@ export const taskActivitySlice = createSlice({
         ];
       }
     },
+    removeLaborCost: (state, action: PayloadAction<LaborCostPayLoad>) => {
+      const taskIndex = findTaskIndex(
+        state.taskActivities,
+        action.payload.modelId
+      );
+
+      if (taskIndex >= 0) {
+        const laborModel = action.payload.laborCost;
+        const laberCosts = state.taskActivities[taskIndex].laborCosts.filter(
+          (laborCost) => {
+            return !(
+              laborCost.name == laborModel.name &&
+              laborCost.price == laborModel.price &&
+              laborCost.qty == laborModel.qty
+            );
+          }
+        );
+
+        state.taskActivities[taskIndex].laborCosts = laberCosts;
+      }
+    },
     addEquipmentCost: (state, action: PayloadAction<EquipmentCostPayLoad>) => {
       const taskIndex = findTaskIndex(
         state.taskActivities,
@@ -127,6 +169,30 @@ export const taskActivitySlice = createSlice({
         ];
       }
     },
+    removeEquipmentCost: (
+      state,
+      action: PayloadAction<EquipmentCostPayLoad>
+    ) => {
+      const taskIndex = findTaskIndex(
+        state.taskActivities,
+        action.payload.modelId
+      );
+
+      if (taskIndex >= 0) {
+        const equipmentModel = action.payload.equipmentCost;
+        const equipmentCosts = state.taskActivities[taskIndex].equipmentCosts;
+
+        state.taskActivities[taskIndex].equipmentCosts = equipmentCosts.filter(
+          (equipmentCost) => {
+            const equipmentCostMatcher =
+              equipmentCost.TypeofEquipment == equipmentModel.TypeofEquipment &&
+              equipmentCost.dailyCost == equipmentModel.dailyCost &&
+              equipmentCost.no == equipmentModel.no;
+            return !equipmentCostMatcher;
+          }
+        );
+      }
+    },
   },
 });
 
@@ -139,6 +205,9 @@ export const {
   addEquipmentCost,
   addKey,
   removeKey,
+  removeEquipmentCost,
+  removeLaborCost,
+  removeMaterialCost,
 } = taskActivitySlice.actions;
 
 export default taskActivitySlice.reducer;

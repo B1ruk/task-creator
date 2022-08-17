@@ -3,14 +3,17 @@ import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import React, { useEffect, useState } from "react";
 import { EquipmentCost } from "../../../model/TaskActivityModel";
-import { useAppSelector } from "../../../store/store";
+import { removeEquipmentCost } from "../../../store/features/taskActivitySlice";
+import { useAppDispatch, useAppSelector } from "../../../store/store";
 import { DefaultBtn } from "../../form/DefaultBtn";
 import { AddEquipmentCostDialog } from "./AddEquipmentCost";
 
-export const EquipmentCostView = ({ modelId,cost }) => {
+export const EquipmentCostView = ({ modelId, cost }) => {
   const [modalToggle, setModalToggle] = useState(false);
 
   const [isParent, setIsParent] = useState(false);
+
+  const dispatch = useAppDispatch();
 
   const taskActivities = useAppSelector(
     (state) => state.taskActivity.taskActivities
@@ -21,9 +24,17 @@ export const EquipmentCostView = ({ modelId,cost }) => {
     setModalToggle(!modalToggle);
   };
 
-  const removeAction=(data)=>{
-    return <Button icon="pi pi-trash" className="p-button-outlined p-button-sm p-button-danger" onClick={()=>console.log(data)}/>
-  }
+  const removeAction = (data) => {
+    return (
+      <Button
+        icon="pi pi-trash"
+        className="p-button-outlined p-button-sm p-button-danger"
+        onClick={() => {
+          dispatch(removeEquipmentCost({ equipmentCost: data, modelId }));
+        }}
+      />
+    );
+  };
 
   useEffect(() => {
     const selectedTask = taskActivities.find(
@@ -66,9 +77,9 @@ export const EquipmentCostView = ({ modelId,cost }) => {
         <Column field="TypeofEquipment" header="Type Of Equipment" />
         <Column field="no" header="No" />
         <Column field="dailyCost" header="Daily Cost" />
-        <Column header="Action" body={removeAction}/>
+        <Column header="Action" body={removeAction} />
       </DataTable>
-      <p className="mt-4 font-semibold text-base">Total Amount :  {cost}</p>
+      <p className="mt-4 font-semibold text-base">Total Amount : {cost}</p>
     </div>
   );
 };

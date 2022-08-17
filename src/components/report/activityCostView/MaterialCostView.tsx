@@ -4,7 +4,11 @@ import { DataTable } from "primereact/datatable";
 import { Toast } from "primereact/toast";
 import { useEffect, useRef, useState } from "react";
 import { LaborCost, MaterialCost } from "../../../model/TaskActivityModel";
-import { useAppSelector } from "../../../store/store";
+import {
+  removeLaborCost,
+  removeMaterialCost,
+} from "../../../store/features/taskActivitySlice";
+import { useAppDispatch, useAppSelector } from "../../../store/store";
 import { AddMaterialCost } from "../../task/activity/AddMaterialCost";
 
 export const MaterialCostView = ({
@@ -22,6 +26,8 @@ export const MaterialCostView = ({
   const [laborCostTotal, setLaborCostTotal] = useState<number>(0);
 
   const toast = useRef();
+
+  const dispatch = useAppDispatch();
 
   const taskActivities = useAppSelector(
     (state) => state.taskActivity.taskActivities
@@ -94,7 +100,13 @@ export const MaterialCostView = ({
       <Button
         icon="pi pi-trash"
         className="p-button-outlined p-button-sm p-button-danger"
-        onClick={() => console.log(data)}
+        onClick={() => {
+          if (isMaterial) {
+            dispatch(removeMaterialCost({materialCost:data,modelId}));
+          } else {
+            dispatch(removeLaborCost({laborCost:data,modelId}));
+          }
+        }}
       />
     );
   };
